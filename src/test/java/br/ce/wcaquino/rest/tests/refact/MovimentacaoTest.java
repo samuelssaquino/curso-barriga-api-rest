@@ -1,44 +1,20 @@
 package br.ce.wcaquino.rest.tests.refact;
 
+import static br.ce.wcaquino.rest.utils.BarrigaUtils.getIdContaPeloNome;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.hamcrest.core.Is;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import br.ce.wcaquino.rest.core.BaseTest;
 import br.ce.wcaquino.rest.tests.Movimentacao;
+import br.ce.wcaquino.rest.utils.BarrigaUtils;
 import br.ce.wcaquino.rest.utils.DataUtils;
-import io.restassured.RestAssured;
 
 public class MovimentacaoTest extends BaseTest{
-
-    @BeforeClass
-    public static void login(){
-        Map<String, String> login = new HashMap<>();
-        login.put("email", "ts@ts.com");
-        login.put("senha", "ts123456");
-
-        String TOKEN = given()
-            .body(login)
-        .when()
-            .post("/signin")
-        .then()
-            .statusCode(200)
-            .extract().path("token")
-        ;
-
-        RestAssured.requestSpecification.header("Authorization", "JWT " + TOKEN);
-
-        RestAssured.get("/reset").then().statusCode(200);
-    }
 
     @Test
     public void deveInserirMovimentacaoComSucesso(){     
@@ -113,7 +89,7 @@ public class MovimentacaoTest extends BaseTest{
 
     @Test
     public void deveRemoverMovimentacao(){    
-        Integer MOV_ID = getIdMovPeloDescricao("Movimentacao para exclusao"); 
+        Integer MOV_ID = BarrigaUtils.getIdMovPeloDescricao("Movimentacao para exclusao"); 
 
         given()           
             .pathParam("id", MOV_ID)
@@ -136,14 +112,5 @@ public class MovimentacaoTest extends BaseTest{
         mov.setValor(100f);
         mov.setStatus(true);
         return mov;
-    }
-
-    public Integer getIdContaPeloNome(String nome){        
-        return RestAssured.get("/contas?nome="+nome).then().extract().path("id[0]");
-    }
-
-    public Integer getIdMovPeloDescricao(String desc){        
-        return RestAssured.get("/transacoes?descricao="+desc).then().extract().path("id[0]");
-    }
-    
+    }    
 }
